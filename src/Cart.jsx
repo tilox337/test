@@ -17,23 +17,23 @@ function Cart({
 
   if (!isCartOpen) return null;
 
-  const getUserName = () => {
+  const getTelegramUser = () => {
     if (!window.Telegram?.WebApp) {
       alert("Откройте приложение внутри Telegram");
       return null;
     }
 
     const tg = window.Telegram.WebApp;
+    const user = tg.initDataUnsafe?.user;
 
-    const username = tg.initDataUnsafe?.user?.username;
-
-    if (!username) {
+    if (!user) {
       tg.showAlert(
-        "На вашем аккаунте Telegram не указан username. Пожалуйста, установите его в настройках профиля.",
+        "Не удалось получить данные пользователя Telegram. Попробуйте открыть приложение повторно.",
       );
       return null;
     }
-    return username;
+
+    return user;
   };
 
   const handleTimeSelect = (selectedTime) => {
@@ -131,8 +131,8 @@ function Cart({
                   className="cart-order"
                   type="button"
                   onClick={async () => {
-                    const username = getUserName();
-                    if (!username) return;
+                    const telegramUser = getTelegramUser();
+                    if (!telegramUser) return;
 
                     if (!deliveryTime) {
                       setIsTimePickerOpen(true);
@@ -148,15 +148,13 @@ function Cart({
                             "Content-Type": "application/json",
                           },
                           body: JSON.stringify({
+                            initData: window.Telegram?.WebApp?.initData || "",
                             items: cart.map(({ product, variant, qty }) => ({
                               productId: product.id,
                               variantId: variant?.id || product.variants[0]?.id,
                               quantity: qty,
                             })),
-                            userData: {
-                              name: username,
-                              deliveryTime,
-                            },
+                            deliveryTime,
                           }),
                         },
                       );
