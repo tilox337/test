@@ -162,21 +162,23 @@ function Cart({
                       const data = await response.json();
 
                       if (!response.ok) {
-                        window.Telegram?.WebApp.showAlert(
-                          `Ошибка: ${data.message}`,
+                        throw new Error(
+                          data.message || "Неизвестная ошибка сервера",
                         );
-                        return;
                       }
 
-                      window.Telegram?.WebApp.showAlert(
-                        `Заказ создан! ID: ${data.id}`,
-                      );
+                      const alertMessage =
+                        `Заказ создан! ID: ${data.id} \n` + response.status ===
+                        202
+                          ? `Напишите менеджеру ID закза чтобы получить координаты и видео с места встречи.`
+                          : ``;
+                      window.Telegram?.WebApp.showAlert(alertMessage);
                       setDeliveryTime(null);
                       onClear();
                     } catch (err) {
                       console.error("Ошибка отправки заказа:", err);
                       window.Telegram?.WebApp.showAlert(
-                        `Ошибка: ${err.message}`,
+                        `Ошибка: ${err.message}\n Напишите менеджеру, и он поможет решить сложившуюсь ситуацию`,
                       );
                     }
                   }}
