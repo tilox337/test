@@ -16,7 +16,10 @@ function ProductCart({ product, qty = 0, getVariantQty, onAdd, onRemove }) {
     return initial;
   });
 
-  const imgSrc = product && product.image ? product.image : defaultImage;
+  const imgSrc =
+    product && product.image
+      ? `http://localhost:3000/api/products/image/${product.image}`
+      : defaultImage;
   const text = product && product.text ? product.text : "товар";
   const variants =
     product && Array.isArray(product.variants) && product.variants.length
